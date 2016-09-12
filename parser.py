@@ -4,7 +4,6 @@
 from __future__ import with_statement
 from bs4 import BeautifulSoup
 from glob import glob
-
 import argparse
 import os
 import re
@@ -24,37 +23,24 @@ def main(args):
     sql = None
     if not args.stdout:
         sql = sqlite3.connect(args.database)
+        #[game, airdate, round, category, value, clue, answer]
         sql.execute("""PRAGMA foreign_keys = ON;""")
-        sql.execute("""CREATE TABLE airdates(
-            game INTEGER PRIMARY KEY,
-            airdate TEXT
-        );""")
-        sql.execute("""CREATE TABLE documents(
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            clue TEXT,
-            answer TEXT
-        );""")
-        sql.execute("""CREATE TABLE categories(
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            category TEXT UNIQUE
-        );""")
         sql.execute("""CREATE TABLE clues(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             game INTEGER,
+            airdate TEXT,
             round INTEGER,
+            category TEXT,
             value INTEGER,
-            FOREIGN KEY(id) REFERENCES documents(id),
-            FOREIGN KEY(game) REFERENCES airdates(game)
-        );""")
-        sql.execute("""CREATE TABLE classifications(
-            clue_id INTEGER,
-            category_id INTEGER,
-            FOREIGN KEY(clue_id) REFERENCES clues(id),
-            FOREIGN KEY(category_id) REFERENCES categories(id)
+            clue TEXT,
+            answer TEXT
         );""")
     for i, file_name in enumerate(glob(os.path.join(args.dir, "*.html")), 1):
+	print i
         with open(os.path.abspath(file_name)) as f:
             parse_game(f, sql, i)
+        if i%1000 ==0:
+            sql.commit()
     if not args.stdout:
         sql.commit()
     print "All done"
@@ -74,7 +60,11 @@ def parse_game(f, sql, gid):
     if not r:
         # This game does not have a final clue
         return
-    category = r.find("td", class_="category_name").get_text()
+    category = r.find("td", class_="category_name")
+    if not category:
+	print "err"
+        return
+    category = category.get_text()
     text = r.find("td", class_="clue_text").get_text()
     answer = BeautifulSoup(r.find("div", onmouseover=True).get("onmouseover"), "lxml")
     answer = answer.find("em").get_text()
@@ -99,7 +89,7 @@ def parse_round(bsoup, sql, rnd, gid, airdate):
         is_missing = True if not a.get_text().strip() else False
         if not is_missing:
             value = a.find("td", class_=re.compile("clue_value")).get_text().lstrip("D: $")
-            text = a.find("td", class_="clue_text").get_text()
+            text = a.find("td", class_="clue_text").get_text()  
             answer = BeautifulSoup(a.find("div", onmouseover=True).get("onmouseover"), "lxml")
             answer = answer.find("em", class_="correct_response").get_text()
             insert(sql, [gid, airdate, rnd, categories[x], value, text, answer])
@@ -121,6 +111,8 @@ def insert(sql, clue):
     """Inserts the given clue into the database."""
     # Clue is [game, airdate, round, category, value, clue, answer]
     # Note that at this point, clue[4] is False if round is 3
+    #[game, airdate, round, category, value, clue, answer]
+
     if "\\\'" in clue[6]:
         clue[6] = clue[6].replace("\\\'", "'")
     if "\\\"" in clue[6]:
@@ -128,16 +120,7 @@ def insert(sql, clue):
     if not sql:
         print clue
         return
-    sql.execute(
-        "INSERT OR IGNORE INTO airdates VALUES(?, ?);",
-        (clue[0], clue[1], )
-    )
-    sql.execute("INSERT OR IGNORE INTO categories(category) VALUES(?);", (clue[3], ))
-    category_id = sql.execute("SELECT id FROM categories WHERE category=?;", (clue[3], )).fetchone()[0]
-    clue_id = sql.execute("INSERT INTO documents(clue, answer) VALUES(?, ?);", (clue[5], clue[6], )).lastrowid
-    sql.execute("INSERT INTO clues(game, round, value) VALUES(?, ?, ?);", (clue[0], clue[2], clue[4], ))
-    sql.execute("INSERT INTO classifications VALUES(?, ?)", (clue_id, category_id, ))
-
+    sql.execute("INSERT INTO clues Values(null,?, ?, ?, ?, ?, ?, ?)",(clue[0],clue[1],clue[2],clue[3],clue[4],clue[5],clue[6], ))
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
@@ -152,11 +135,12 @@ if __name__ == "__main__":
     parser.add_argument("-f", "--filename", dest="database",
                         metavar="<filename>",
                         help="the filename for the SQLite database",
-                        default="clues.db")
+                        default="jclues.db")
     parser.add_argument("--stdout",
                         help="output the clues to stdout and not a database",
                         action="store_true")
     parser.add_argument("--help", action="help",
                         help="show this help message and exit")
-    parser.add_argument("--version", action="version", version="2014.09.14")
+    parser.add_argument("--version", action="version", version="2016.09.11")
     main(parser.parse_args())
+

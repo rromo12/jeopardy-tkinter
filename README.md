@@ -1,86 +1,50 @@
 [![No Maintenance Intended](http://unmaintained.tech/badge.svg)](http://unmaintained.tech/)
 
-Jeopardy parser
+Jeopardy Clone
 ===============
+This is a simple jeapordy game,no values, no scoring, just the clues and answers. 
 
-Quick note: this project does **not** use semantic versioning (`python parser.py --version` outputs the last updated date of the script).
 
 What is this?
 -------------
 
-This is a Python script to extract [Jeopardy!] clues from the [J! Archive] website and dump them into a SQLite database for use elsewhere (no particular application is intended). Python 2.7.* and SQLite 3.7.* on *nix have been tested and confirmed to work (requires BeautifulSoup 4 and the lxml parser).
+A simple jeopardy board generator/viewer. This project was design mostly for my own use learning trivia and having fun with my family.
+
+The downloader and parser were modified from whymarrh's [Jeopardy Parser]:https://github.com/whymarrh/jeopardy-parser fixing a few errors I ran into and simplifying the database structure as I did not need all the information captured by the scraper.
+
 
   [Jeopardy!]:http://www.jeopardy.com/
   [J! Archive]:http://j-archive.com/
+  [Original Jeopardy Parser]:https://github.com/whymarrh/jeopardy-parser
 
 Quick start
 -----------
-
+Create jclues.db 
 ```bash
-git clone git://github.com/whymarrh/jeopardy-parser.git
-cd jeopardy-parser
-pip install -r requirements.txt
 python download.py
 python parser.py
 ```
+This process can take up to 2 hours
 
-How long will all this take?
+After this you can run:
+
+```bash
+python jeapordy.py
+```
+
+You will be greeted with a jeapordy game board listing the categories and clues. Click on a clue to view the answer.
+
+TODO
 ----------------------------
+Provide Simple GUI for Download and Parsing Scripts
 
-There are two important steps:
+Provide a simple editor for teachers/custom clues
 
-1. Downloading the game files from the J! Archive website
-2. Parsing and inserting them into the database
+Possibly:
 
-The first step, downloading, will depend on the machine: the download script will use twice the number of available cores to download game files in parallel and will take around an hour to complete. The second step, parsing, should take ~30 minutes (on a 1.7 GHz Core i5 w/ 4 GB RAM). In total, you're looking at around 2 hours (probably less).
+Create raspberry pi version with 3 buttons for players, score keeping, daily doubles,timed clues, etc...
 
-The complete download of the game files is ~350MB, and the resulting database file is ~50MB (although these numbers are qucikly outdated as the number of games increases).
-
-Querying the database
----------------------
-
-The database is split into 5 tables:
-
-| Table name        | What it holds                                          |
-| ----------------- | ------------------------------------------------------ |
-| `airdates`        | Airdates for the shows, indexed by game number         |
-| `documents`       | Mappings from clue IDs to clue text and answers        |
-| `categories`      | The categories                                         |
-| `clues`           | Clue IDs with metadata (game number, round, and value) |
-| `classifications` | Mappings from clue IDs to category IDs                 |
-
-To get all the clues along with their metadata:
-
-```sql
-SELECT clues.id, game, round, value, clue, answer
-FROM clues
-JOIN documents ON clues.id = documents.id
--- WHERE <expression>
-;
-```
-
-To get the category that a clue is in, given a clue id:
-
-```sql
-SELECT clue_id, category
-FROM classifications
-JOIN categories ON category_id = categories.id
--- WHERE <expression>
-;
-```
-
-To get everything (although it is better to pick and choose what you're looking for):
-
-```sql
-SELECT clues.id, clues.game, airdate, round, value, category, clue, answer
-FROM clues
-JOIN airdates ON clues.game = airdates.game
-JOIN documents ON clues.id = documents.id
-JOIN classifications ON clues.id = classifications.clue_id
-JOIN categories ON classifications.category_id = categories.id
--- WHERE <expression>
-;
-```
+Will require a 4th player to play judge
 
 License
 -------
