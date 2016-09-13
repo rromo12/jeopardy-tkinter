@@ -21,16 +21,11 @@ Quick start
 -----------
 Create jclues.db 
 ```bash
-python download.py
-python parser.py
+python main_app.py
 ```
-This process can take up to 2 hours
+First Download and Parse Files Creating a jclues.db file of ~48mb
 
-After this you can run:
-
-```bash
-python jeapordy.py
-```
+After this you can start a new game
 
 You will be greeted with a jeapordy game board listing the categories and clues. Click on a clue to view the answer.
 
@@ -38,7 +33,7 @@ TODO
 ----------------------------
 Provide Simple GUI for Download and Parsing Scripts
 
-Provide a simple editor for teachers/custom clues
+Provide a simple editor for teachers/custom clues 
 
 Possibly:
 

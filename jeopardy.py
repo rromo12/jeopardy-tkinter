@@ -192,12 +192,14 @@ class finalJeopardyDialog(tk.Frame):
         self.jeopardy.finalJeopardy()
         self.master.destroy()
 
-
-if __name__ == "__main__":
+def StartJeopardy():
     root = tk.Tk()
     root.title("JEOPARDY! Round 1")
     root.geometry("1010x680")
     root.resizable(0,0)
     Jeapardy(root)
     root.mainloop()
+
+if __name__ == "__main__":
+    Start()
 
