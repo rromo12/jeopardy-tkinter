@@ -1,4 +1,0 @@
-hiddenimports = [
-    "jeopardy.*",
-    "jeopardy.ANY.*"
-]

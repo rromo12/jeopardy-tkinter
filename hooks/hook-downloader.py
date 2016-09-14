@@ -1,4 +1,0 @@
-hiddenimports = [
-    "downloader.*",
-    "downloader.ANY.*"
-]

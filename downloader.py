@@ -18,7 +18,12 @@ class Downloader(tk.Frame):
 
     def __init__(self, parent,*args,**kwargs):
         self.text = tk.StringVar()
-        self.current_working_directory = os.path.dirname(os.path.abspath(__file__))
+        # determine if application is a script file or frozen exe
+        if getattr(sys, 'frozen', False):
+            application_path = os.path.dirname(sys.executable)
+        elif __file__:
+            application_path = os.path.dirname(__file__)
+        self.current_working_directory = application_path
         self.archive_folder = os.path.join(self.current_working_directory, "j-archive")
         self.SECONDS_BETWEEN_REQUESTS = 5
         self.ERROR_MSG = "ERROR: No game"
