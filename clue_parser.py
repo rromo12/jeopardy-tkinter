@@ -57,17 +57,18 @@ class Parser(tk.Frame):
         NUMBER_OF_FILES = len(os.listdir(self.dir))
         print "Parsing", NUMBER_OF_FILES, "files"
         #[game, airdate, round, category, value, clue, answer]
-        self.sql.execute("""PRAGMA foreign_keys = ON;""")
-        self.sql.execute("""CREATE TABLE clues(
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            game INTEGER,
-            airdate TEXT,
-            round INTEGER,
-            category TEXT,
-            value INTEGER,
-            clue TEXT,
-            answer TEXT
-        );""")
+        if not os.path.isfile(self.database):
+            self.sql.execute("""PRAGMA foreign_keys = ON;""")
+            self.sql.execute("""CREATE TABLE clues(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                game INTEGER,
+                airdate TEXT,
+                round INTEGER,
+                category TEXT,
+                value INTEGER,
+                clue TEXT,
+                answer TEXT
+            );""")
         for i, file_name in enumerate(glob(os.path.join(self.dir, "*.html")), 1):
             self.parsed +=1
             self.progress["value"] = self.parsed/self.total
@@ -170,4 +171,4 @@ def StartParser():
     root.mainloop()
 
 if __name__ == "__main__":
-    Start()
+    StartParser()

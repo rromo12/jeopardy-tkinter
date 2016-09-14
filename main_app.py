@@ -13,9 +13,9 @@ class MainApplication(tk.Frame):
 		self.parent = parent
 		#Create Buttons
 		self.newGameButton = tk.Button(self.parent, 
-                         text="New Game", fg="black",
+                         text="New Game", fg="black",height = 2,
                          command=jeopardy.StartJeopardy)
-		self.newGameButton.pack(side=tk.TOP)
+		self.newGameButton.pack(fill=tk.X,side=tk.TOP)
 		
 		# self.startEditorButton = tk.Button(self.parent, 
   #                        text="Create a Board", fg="black",
@@ -23,20 +23,20 @@ class MainApplication(tk.Frame):
 		# self.startEditorButton.pack(side=tk.TOP)
 
 		self.startDownloaderButton = tk.Button(self.parent, 
-                         text="Start Downloader", fg="black",
+                         text="Start Downloader", fg="black",height = 2,
                          command=downloader.StartDownloader)
-		self.startDownloaderButton.pack(side=tk.TOP)
+		self.startDownloaderButton.pack(fill=tk.X , side=tk.TOP)
 
 		self.startParserButton = tk.Button(self.parent, 
-                         text="Start Parse", fg="black",
+                         text="Start Parse", fg="black", height = 2,
                          command=clue_parser.StartParser)
-		self.startParserButton.pack(side=tk.TOP)
+		self.startParserButton.pack(fill=tk.X,side=tk.TOP)
 
 
 		self.quitButton = tk.Button(self.parent, 
-                         text="QUIT", fg="red",
+                         text="QUIT", fg="red", height=2,
                          command=self.parent.quit)
-		self.quitButton.pack(side=tk.TOP)
+		self.quitButton.pack(fill=tk.X,side=tk.TOP)
 		
 
 
@@ -58,7 +58,7 @@ class MainApplication(tk.Frame):
 if __name__ == "__main__":
 	root = tk.Tk()
 	root.title("JEOPARDY!")
-	root.geometry("1010x680")
+	root.geometry("200x160")
 	root.resizable(0,0)
 	MainApplication(root)
 	root.mainloop()

@@ -1,0 +1,4 @@
+hiddenimports = [
+    "jeopardy.*",
+    "jeopardy.ANY.*"
+]

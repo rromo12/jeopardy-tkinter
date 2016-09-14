@@ -1,0 +1,4 @@
+hiddenimports = [
+    "downloader.*",
+    "downloader.ANY.*"
+]

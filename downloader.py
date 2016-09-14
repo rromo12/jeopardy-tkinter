@@ -142,4 +142,4 @@ def StartDownloader():
 
 
 if __name__ == "__main__":
-    Start()
+    StartDownloader()
